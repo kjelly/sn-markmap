@@ -4,8 +4,6 @@ import { Transformer } from 'markmap-lib';
 import { Markmap } from 'markmap-view';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 
-
-
 const transformer = new Transformer();
 
 export enum HtmlElementId {
@@ -67,7 +65,7 @@ export default class Editor extends React.Component<{}, EditorInterface> {
         });
         this.updateSvg();
       },
-      clearUndoHistory: () => { },
+      clearUndoHistory: () => {},
       getElementsBySelector: () => [],
     };
 
@@ -81,7 +79,6 @@ export default class Editor extends React.Component<{}, EditorInterface> {
     this.saveText(value);
     this.setState({ text: value }, this.updateSvg);
   };
-
 
   saveText = (text: string) => {
     this.saveNote(text);
@@ -102,9 +99,9 @@ export default class Editor extends React.Component<{}, EditorInterface> {
     }
   };
 
-  onBlur = (e: React.FocusEvent) => { };
+  onBlur = (e: React.FocusEvent) => {};
 
-  onFocus = (e: React.FocusEvent) => { };
+  onFocus = (e: React.FocusEvent) => {};
 
   onKeyDown = (e: React.KeyboardEvent | KeyboardEvent) => {
     keyMap.set(e.key, true);
@@ -131,7 +128,7 @@ export default class Editor extends React.Component<{}, EditorInterface> {
         <svg ref={this.bindSvg} />
         <MarkdownEditor
           value={text}
-          onChange={(value, viewUpdate) => this.handleInputChangeString(value)} 
+          onChange={(value, viewUpdate) => this.handleInputChangeString(value)}
         />
       </div>
     );
