@@ -14,9 +14,9 @@ A [Standard Notes](https://standardnotes.com/) editor that turns Markdown into a
 
 ## Install in Standard Notes
 
-Open the [plugin page](https://kjelly.github.io/sn-markmap/) to preview the editor. To install it in Standard Notes, use the plugin manifest URL—not the editor page URL:
+Open the [plugin page](https://kjelly.github.io/sn-markmap/) to preview the editor. To install it in Standard Notes, import this manifest URL—not the editor page URL:
 
-`https://kjelly.github.io/sn-markmap/sample.ext.json`
+[https://raw.githubusercontent.com/kjelly/sn-markmap/main/public/sample.ext.json](https://raw.githubusercontent.com/kjelly/sn-markmap/main/public/sample.ext.json)
 
 1. Open Standard Notes on the web or desktop app.
 2. Open **Extensions**. Depending on the app version, this may be under **Preferences → Plugins**.
@@ -26,6 +26,13 @@ Open the [plugin page](https://kjelly.github.io/sn-markmap/) to preview the edit
 6. Open a note and choose **markmap** from the editor menu below the note title.
 
 The editor stores plain Markdown in the note, so the content remains readable if you switch back to another editor.
+
+### Why are there two URLs?
+
+- **GitHub Raw** hosts `sample.ext.json`. Standard Notes allows this domain in its Content Security Policy, so it is the URL used for installation and updates.
+- **GitHub Pages** hosts the editor application at `https://kjelly.github.io/sn-markmap/index.html`, which the manifest loads after installation.
+
+Do not paste `https://kjelly.github.io/sn-markmap/sample.ext.json` into Standard Notes: the app blocks requests to the GitHub Pages domain before it can read the manifest.
 
 > Custom plugins are third-party code. Install only from sources you trust. See the [Standard Notes plugin installation guide](https://standardnotes.com/help/85/how-do-i-install-third-party-plugins) for more detail.
 
@@ -83,19 +90,27 @@ The editor is available at `http://localhost:8001`.
    cp public/sample.ext.json public/ext.json
    ```
 
-2. Edit `public/ext.json` and set both `url` and `latest_url` to `http://localhost:8001`.
+2. Edit `public/ext.json`:
+
+   ```json
+   {
+     "url": "http://localhost:8001/index.html",
+     "latest_url": "http://localhost:8001/ext.json"
+   }
+   ```
+
 3. Keep `yarn start` running.
 4. In Standard Notes, open **Extensions** and import `http://localhost:8001/ext.json`.
 5. Activate the editor, open a note, and select **markmap** from the note's editor menu.
 
-For a production-like local check, build first and serve the generated files with CORS enabled:
+For a production-like local check, update those two URLs to port `3000`, then build and serve the generated files with CORS enabled:
 
 ```bash
 yarn build
 npx http-server ./build -p 3000 --cors
 ```
 
-Then point a local manifest at `http://localhost:3000`.
+Import `http://localhost:3000/ext.json` in Standard Notes.
 
 ## Quality checks
 
@@ -113,13 +128,19 @@ Pushing to `main` runs the GitHub Actions workflow and publishes `build/` to the
 
 `https://kjelly.github.io/sn-markmap/`
 
+The install manifest is intentionally served from the `main` branch through GitHub Raw:
+
+`https://raw.githubusercontent.com/kjelly/sn-markmap/main/public/sample.ext.json`
+
+After pushing a manifest change, wait for the Pages workflow to complete before installing it: the manifest is updated by the `main` push, while its editor URL must point to the corresponding GitHub Pages deployment.
+
 The workflow can also be started manually from the repository's **Actions** tab. For a local fallback, `yarn deploy-stable` builds and publishes directly to `gh-pages`.
 
 ## Project structure
 
 - `src/components/Editor.tsx` — Standard Notes bridge, Markdown editor, and Markmap controls
 - `src/stylesheets/main.scss` — responsive layout and accessibility styles
-- `public/sample.ext.json` — hosted plugin manifest
+- `public/sample.ext.json` — Standard Notes manifest, served to installers through GitHub Raw
 - `.github/workflows/deploy-pages.yml` — GitHub Pages deployment workflow
 
 ## License
