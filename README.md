@@ -8,7 +8,7 @@ A [Standard Notes](https://standardnotes.com/) editor that turns Markdown into a
 
 - Markdown editor with a live Markmap preview
 - Resizable desktop split pane and a mobile-friendly stacked layout
-- Fit, zoom, preview toggle, and fullscreen controls
+- Fit, zoom, and preview toggle controls
 - Example content for a quick start
 - Standard Notes theme variables, keyboard focus styles, and reduced-motion support
 
@@ -54,7 +54,7 @@ Start with a heading and add nested headings or lists. For example:
 - Test the flow
 ```
 
-The preview updates shortly after you pause typing. Use the toolbar to load an example, fit the map to the pane, zoom, change the editor width, hide the preview, or enter fullscreen mode. You can also drag the map to pan and scroll to zoom.
+The preview updates shortly after you pause typing. Use the toolbar to fit the map to the pane, zoom, change the editor width, or toggle the preview. When the map is empty, use the button in the canvas to load example content. You can also drag the map to pan and scroll to zoom.
 
 ## Develop locally
 

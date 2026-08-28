@@ -52,15 +52,15 @@ input:focus-visible {
 .editor-toolbar {
   background: var(--sn-stylekit-secondary-background-color);
   border-bottom: 1px solid var(--pane-border);
-  gap: 12px;
+  gap: 8px;
   justify-content: space-between;
-  min-height: 52px;
-  padding: 8px 12px;
+  min-height: 40px;
+  padding: 4px 8px;
 }
 
 .toolbar-group {
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-wrap: nowrap;
+  gap: 4px;
 }
 
 .toolbar-button,
@@ -70,8 +70,8 @@ input:focus-visible {
   border-radius: 5px;
   color: var(--sn-stylekit-contrast-foreground-color);
   cursor: pointer;
-  min-height: 32px;
-  padding: 5px 9px;
+  min-height: 28px;
+  padding: 3px 8px;
 }
 
 .toolbar-button:hover,
@@ -205,13 +205,11 @@ input:focus-visible {
   }
 
   .editor-toolbar {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
   }
 
   .toolbar-layout-controls {
-    justify-content: space-between;
-    width: 100%;
+    margin-left: auto;
   }
 
   .pane-width-control {

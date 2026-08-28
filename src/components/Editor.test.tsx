@@ -26,7 +26,9 @@ test('renders the markdown editor and preview controls', () => {
   expect(
     screen.getByText(/build a mind map from markdown/i)
   ).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /fit view/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: /fit map to view/i })
+  ).toBeInTheDocument();
   expect(
     screen.getByRole('slider', { name: /editor pane width/i })
   ).toBeInTheDocument();

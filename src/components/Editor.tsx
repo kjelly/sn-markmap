@@ -139,17 +139,6 @@ export default class Editor extends React.Component<{}, EditorInterface> {
       }
     );
 
-  toggleFullscreen = () => {
-    if (!this.container) {
-      return;
-    }
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
-      return;
-    }
-    void this.container.requestFullscreen?.();
-  };
-
   setEditorWidth = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ editorWidth: Number(event.target.value) }, () => {
       window.requestAnimationFrame(this.fitMap);
@@ -176,21 +165,17 @@ export default class Editor extends React.Component<{}, EditorInterface> {
             <button
               className="toolbar-button"
               type="button"
-              onClick={this.loadExample}
-            >
-              Load example
-            </button>
-            <button
-              className="toolbar-button"
-              type="button"
+              aria-label="Fit map to view"
+              title="Fit map to view"
               onClick={this.fitMap}
             >
-              Fit view
+              Fit
             </button>
             <button
               className="toolbar-button"
               type="button"
               aria-label="Zoom out"
+              title="Zoom out"
               onClick={() => this.zoomMap(0.8)}
             >
               −
@@ -199,6 +184,7 @@ export default class Editor extends React.Component<{}, EditorInterface> {
               className="toolbar-button"
               type="button"
               aria-label="Zoom in"
+              title="Zoom in"
               onClick={() => this.zoomMap(1.2)}
             >
               +
@@ -220,16 +206,10 @@ export default class Editor extends React.Component<{}, EditorInterface> {
               className="toolbar-button preview-toggle"
               type="button"
               aria-pressed={previewVisible}
+              title={previewVisible ? 'Hide preview' : 'Show preview'}
               onClick={this.togglePreview}
             >
-              {previewVisible ? 'Hide preview' : 'Show preview'}
-            </button>
-            <button
-              className="toolbar-button"
-              type="button"
-              onClick={this.toggleFullscreen}
-            >
-              Fullscreen
+              {previewVisible ? 'Preview' : 'Show preview'}
             </button>
           </div>
         </header>
