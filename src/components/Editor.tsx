@@ -6,128 +6,281 @@ import MarkdownEditor from '@uiw/react-markdown-editor';
 
 const transformer = new Transformer();
 
+const exampleMarkdown = `# Project plan
+
+## Research
+- Gather requirements
+- Review references
+
+## Build
+- Create the first draft
+- Test the flow
+
+## Share
+- Collect feedback
+- Publish`;
+
 export enum HtmlElementId {
   snComponent = 'sn-component',
-  textarea = 'textarea',
-}
-
-export enum HtmlClassName {
-  snComponent = 'sn-component',
-  textarea = 'sk-input contrast textarea',
 }
 
 export interface EditorInterface {
   printUrl: boolean;
   text: string;
+  editorWidth: number;
+  previewVisible: boolean;
 }
 
-const initialState = {
+const initialState: EditorInterface = {
   printUrl: false,
   text: '',
-  value: '',
+  editorWidth: 50,
+  previewVisible: true,
 };
-
-let keyMap = new Map();
 
 export default class Editor extends React.Component<{}, EditorInterface> {
   private editorKit?: EditorKit;
+  private container?: HTMLDivElement;
   private svg?: SVGSVGElement;
   private mm?: Markmap;
+  private updateTimer?: number;
 
-  constructor(props: EditorInterface) {
+  constructor(props: {}) {
     super(props);
     this.state = initialState;
   }
 
   componentDidMount() {
     this.configureEditorKit();
-    this.mm = Markmap.create(this.svg!);
-    this.updateSvg();
+    const prefersReducedMotion = window.matchMedia?.(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    this.mm = Markmap.create(this.svg!, {
+      duration: prefersReducedMotion ? 0 : 300,
+    });
+    this.updateSvg(true);
   }
 
-  bindSvg = (el: any) => {
-    this.svg = el;
+  componentWillUnmount() {
+    if (this.updateTimer) {
+      window.clearTimeout(this.updateTimer);
+    }
+    this.mm?.destroy();
+  }
+
+  bindContainer = (el: HTMLDivElement | null) => {
+    this.container = el ?? undefined;
   };
 
-  updateSvg = () => {
+  bindSvg = (el: SVGSVGElement | null) => {
+    this.svg = el ?? undefined;
+  };
+
+  updateSvg = (fit = false) => {
+    if (!this.mm) {
+      return;
+    }
     const { root } = transformer.transform(this.state.text);
-    this.mm!.setData(root);
-    this.mm!.fit();
+    void this.mm.setData(root).then(() => {
+      if (fit) {
+        void this.mm?.fit();
+      }
+    });
+  };
+
+  scheduleMapUpdate = () => {
+    if (this.updateTimer) {
+      window.clearTimeout(this.updateTimer);
+    }
+    this.updateTimer = window.setTimeout(() => this.updateSvg(), 350);
   };
 
   configureEditorKit = () => {
     const delegate: EditorKitDelegate = {
-      /** This loads every time a different note is loaded */
       setEditorRawText: (text: string) => {
-        this.setState({
-          ...initialState,
-          text,
-        });
-        this.updateSvg();
+        this.setState({ ...initialState, text }, () => this.updateSvg(true));
       },
       clearUndoHistory: () => {},
-      handleRequestForContentHeight: () => undefined,
+      handleRequestForContentHeight: () => this.container?.scrollHeight,
     };
 
     this.editorKit = new EditorKit(delegate, { mode: 'plaintext' });
   };
 
-  handleInputChangeString = (value: string) => {
-    this.saveText(value);
-    this.setState({ text: value }, this.updateSvg);
-  };
-
-  saveText = (text: string) => {
-    this.saveNote(text);
-    this.setState({
-      text: text,
-    });
+  handleInputChange = (value: string) => {
+    this.saveNote(value);
+    this.setState({ text: value }, this.scheduleMapUpdate);
   };
 
   saveNote = (text: string) => {
-    /**
-     * This will work in an SN context, but breaks the standalone editor,
-     * so we need to catch the error
-     */
     try {
       this.editorKit?.onEditorValueChanged(text);
     } catch (error) {
-      console.log('Error saving note:', error);
+      console.error('Unable to save note:', error);
     }
   };
 
-  onBlur = (e: React.FocusEvent) => {};
-
-  onFocus = (e: React.FocusEvent) => {};
-
-  onKeyDown = (e: React.KeyboardEvent | KeyboardEvent) => {
-    keyMap.set(e.key, true);
-    // Do nothing if 'Control' and 's' are pressed
-    if (keyMap.get('Control') && keyMap.get('s')) {
-      e.preventDefault();
-    }
+  loadExample = () => {
+    this.saveNote(exampleMarkdown);
+    this.setState({ text: exampleMarkdown }, () => this.updateSvg(true));
   };
 
-  onKeyUp = (e: React.KeyboardEvent | KeyboardEvent) => {
-    keyMap.delete(e.key);
+  fitMap = () => void this.mm?.fit();
+
+  zoomMap = (scale: number) => void this.mm?.rescale(scale);
+
+  togglePreview = () =>
+    this.setState(
+      (state) => ({ previewVisible: !state.previewVisible }),
+      () => {
+        if (this.state.previewVisible) {
+          window.requestAnimationFrame(this.fitMap);
+        }
+      }
+    );
+
+  toggleFullscreen = () => {
+    if (!this.container) {
+      return;
+    }
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+      return;
+    }
+    void this.container.requestFullscreen?.();
+  };
+
+  setEditorWidth = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ editorWidth: Number(event.target.value) }, () => {
+      window.requestAnimationFrame(this.fitMap);
+    });
   };
 
   render() {
-    const { text } = this.state;
+    const { editorWidth, previewVisible, printUrl, text } = this.state;
+    const hasContent = text.trim().length > 0;
+
     return (
-      <div
-        className={
-          HtmlElementId.snComponent + (this.state.printUrl ? ' print-url' : '')
-        }
+      <main
+        ref={this.bindContainer}
+        className={`${HtmlElementId.snComponent}${
+          printUrl ? ' print-url' : ''
+        }${previewVisible ? '' : ' preview-hidden'}`}
         id={HtmlElementId.snComponent}
-        tabIndex={0}
+        style={
+          { '--editor-pane-width': `${editorWidth}%` } as React.CSSProperties
+        }
       >
-        <svg ref={this.bindSvg} />
-        <MarkdownEditor
-          value={text}
-          onChange={(value, viewUpdate) => this.handleInputChangeString(value)}
-        />
-      </div>
+        <header className="editor-toolbar" aria-label="Mind map controls">
+          <div className="toolbar-group">
+            <button
+              className="toolbar-button"
+              type="button"
+              onClick={this.loadExample}
+            >
+              Load example
+            </button>
+            <button
+              className="toolbar-button"
+              type="button"
+              onClick={this.fitMap}
+            >
+              Fit view
+            </button>
+            <button
+              className="toolbar-button"
+              type="button"
+              aria-label="Zoom out"
+              onClick={() => this.zoomMap(0.8)}
+            >
+              −
+            </button>
+            <button
+              className="toolbar-button"
+              type="button"
+              aria-label="Zoom in"
+              onClick={() => this.zoomMap(1.2)}
+            >
+              +
+            </button>
+          </div>
+          <div className="toolbar-group toolbar-layout-controls">
+            <label className="pane-width-control">
+              <span>Editor width</span>
+              <input
+                aria-label="Editor pane width"
+                type="range"
+                min="30"
+                max="70"
+                value={editorWidth}
+                onChange={this.setEditorWidth}
+              />
+            </label>
+            <button
+              className="toolbar-button preview-toggle"
+              type="button"
+              aria-pressed={previewVisible}
+              onClick={this.togglePreview}
+            >
+              {previewVisible ? 'Hide preview' : 'Show preview'}
+            </button>
+            <button
+              className="toolbar-button"
+              type="button"
+              onClick={this.toggleFullscreen}
+            >
+              Fullscreen
+            </button>
+          </div>
+        </header>
+
+        <section className="workspace" aria-label="Markdown mind map workspace">
+          <section className="editor-pane" aria-labelledby="editor-heading">
+            <div className="pane-heading">
+              <h1 id="editor-heading">Markdown</h1>
+              <span>Changes update the map after a short pause</span>
+            </div>
+            <MarkdownEditor
+              value={text}
+              onChange={(value) => this.handleInputChange(value)}
+            />
+          </section>
+
+          <section className="preview-pane" aria-labelledby="preview-heading">
+            <div className="pane-heading">
+              <h2 id="preview-heading">Mind map</h2>
+              <span>
+                {hasContent
+                  ? 'Drag to pan, scroll to zoom'
+                  : 'Start with Markdown'}
+              </span>
+            </div>
+            <div className="map-canvas">
+              {!hasContent && (
+                <div className="empty-state" role="status">
+                  <strong>Build a mind map from Markdown</strong>
+                  <span>
+                    Write a heading and nested list, or load the example to
+                    begin.
+                  </span>
+                  <button
+                    className="empty-state-button"
+                    type="button"
+                    onClick={this.loadExample}
+                  >
+                    Load example
+                  </button>
+                </div>
+              )}
+              <svg
+                ref={this.bindSvg}
+                aria-label="Interactive mind map preview"
+                role="img"
+              />
+            </div>
+          </section>
+        </section>
+      </main>
     );
   }
 }
