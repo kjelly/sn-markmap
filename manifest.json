@@ -1,6 +1,6 @@
 {
-  "short_name": "Editor Template",
-  "name": "Editor Template CRA TypeScript",
+  "short_name": "Markmap Editor",
+  "name": "Standard Notes Markmap Editor",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#20202b",
+  "background_color": "#20202b"
 }
