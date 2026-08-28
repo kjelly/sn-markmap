@@ -6,6 +6,6 @@
   "version": "0.1.0",
   "description": "Write Markdown and view it as an interactive mind map.",
   "url": "https://kjelly.github.io/sn-markmap/index.html",
-  "latest_url": "https://kjelly.github.io/sn-markmap/sample.ext.json",
+  "latest_url": "https://raw.githubusercontent.com/kjelly/sn-markmap/main/public/sample.ext.json",
   "marketing_url": "https://github.com/kjelly/sn-markmap"
 }
