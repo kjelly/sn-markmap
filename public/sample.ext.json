@@ -1,13 +1,11 @@
 {
-  "identifier": "org.standardnotes.editor-template-cra-typescript",
-  "name": "markmap",
+  "identifier": "org.kjelly.sn-markmap",
+  "name": "Standard Notes Markmap Editor",
   "content_type": "SN|Component",
   "area": "editor-editor",
   "version": "0.1.0",
-  "description": "markdown for mindmap",
-  "url": "https://kjelly.github.io/sn-markmap",
-  "download_url": "",
-  "latest_url": "https://kjelly.github.io/sn-markmap",
-  "marketing_url": "https://github.com/kjelly/sn-markmap",
-  "thumbnail_url": ""
+  "description": "Write Markdown and view it as an interactive mind map.",
+  "url": "https://kjelly.github.io/sn-markmap/index.html",
+  "latest_url": "https://kjelly.github.io/sn-markmap/sample.ext.json",
+  "marketing_url": "https://github.com/kjelly/sn-markmap"
 }

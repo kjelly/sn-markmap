@@ -1,88 +1,127 @@
-# editor-template-cra-typescript
+# Standard Notes Markmap Editor
 
-Template for building editors for Standard Notes using Create React App and TypeScript
+A [Standard Notes](https://standardnotes.com/) editor that turns Markdown into an interactive mind map. Write headings and nested lists on the left; pan and zoom the generated map on the right.
 
-## Development
+**Plugin page:** [https://kjelly.github.io/sn-markmap/](https://kjelly.github.io/sn-markmap/)
 
-**Prerequisites:** Install [Node.js](https://nodejs.org/en/), [Yarn](https://classic.yarnpkg.com/en/docs/install/), and [Git](https://github.com/git-guides/install-git) on your computer.
+## Features
 
-The general instructions setting up an environment to develop Standard Notes extensions can be found [here](https://docs.standardnotes.org/extensions/local-setup). You can also follow these instructions:
+- Markdown editor with a live Markmap preview
+- Resizable desktop split pane and a mobile-friendly stacked layout
+- Fit, zoom, preview toggle, and fullscreen controls
+- Example content for a quick start
+- Standard Notes theme variables, keyboard focus styles, and reduced-motion support
 
-1. Fork the [repository](https://github.com/standardnotes/editor-template-cra-typescript) on GitHub.
-1. [Clone](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) your fork of the repository.
-1. Run `cd editor-template-cra-typescript` to enter the `editor-template-cra-typescript` directory.
-1. Run `yarn install` to install the dependencies on your machine as they are described in `yarn.lock`.
+## Install in Standard Notes
 
-### Testing in the browser
+Open the [plugin page](https://kjelly.github.io/sn-markmap/) to preview the editor. To install it in Standard Notes, use the plugin manifest URL—not the editor page URL:
 
-#### Local
+`https://kjelly.github.io/sn-markmap/sample.ext.json`
 
-1. To run the app in development mode, run `yarn start` and visit http://localhost:8001. Press `ctrl/cmd + C` to exit development mode.
+1. Open Standard Notes on the web or desktop app.
+2. Open **Extensions**. Depending on the app version, this may be under **Preferences → Plugins**.
+3. Choose **Import Extension** or **Install Custom Plugin**.
+4. Paste the manifest URL above and confirm the install.
+5. Activate **markmap** if Standard Notes asks you to do so.
+6. Open a note and choose **markmap** from the editor menu below the note title.
 
-#### Docker
+The editor stores plain Markdown in the note, so the content remains readable if you switch back to another editor.
 
-1. To run the app in a docker container simply run `docker compose up`.
+> Custom plugins are third-party code. Install only from sources you trust. See the [Standard Notes plugin installation guide](https://standardnotes.com/help/85/how-do-i-install-third-party-plugins) for more detail.
 
-To build the app run `docker compose exec editor yarn run build`.
+## Use the editor
 
-### Testing in the Standard Notes app
+Start with a heading and add nested headings or lists. For example:
 
-1.  Create an `ext.json` in the `public` directory. You have three options:
-    1.  Use `sample.ext.json`.
-    1.  Create `ext.json` as a copy of `sample.ext.json`.
-    1.  Follow the instructions [here](https://docs.standardnotes.org/extensions/local-setup) with `url: "http://localhost:3000/index.html"`.
-1.  Install http-server using `sudo npm install -g http-server` then run `yarn server` to serve the `./build` directory at http://localhost:3000.
-1.  To build the app, run `yarn build`.
-1.  Install the editor into the [web](https://app.standardnotes.org) or [desktop](https://standardnotes.org/download) app with `http://localhost:3000/sample.ext.json` or with your custom `ext.json`. Press `ctrl/cmd + C` to shut down the server.
+```md
+# Project plan
 
-### Deployment
+## Research
 
-1. To make the source code prettier, run `yarn pretty`.
-1. To the deploy the build into the `gh-pages` branch of your repository on GitHub, run `yarn deploy-stable`.
-1. To deploy the build into to the `dev` branch for testing, run `yarn deploy-dev`.
-1. To deploy the built into the `build` branch for distributing, run `yarn deploy-build` for distributing builds.
+- Gather requirements
+- Review references
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Build
 
-### Available Scripts
+- Create the first draft
+- Test the flow
+```
 
-In the project directory, you can run:
+The preview updates shortly after you pause typing. Use the toolbar to load an example, fit the map to the pane, zoom, change the editor width, hide the preview, or enter fullscreen mode. You can also drag the map to pan and scroll to zoom.
 
-#### `yarn start`
+## Develop locally
 
-Runs the app in the development mode.\
-Open [http://localhost:8001](http://localhost:8001) to view it in the browser.
+### Prerequisites
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Node.js 26
+- Yarn classic 1.22.x
+- A Standard Notes web or desktop client
 
-#### `yarn test`
+Install dependencies:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+git clone https://github.com/kjelly/sn-markmap.git
+cd sn-markmap
+yarn install --ignore-engines
+```
 
-#### `yarn build`
+`--ignore-engines` is required because an older transitive Standard Notes package has a stale Node version declaration, although the plugin is built and tested with Node 26.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Start the development server:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+yarn start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The editor is available at `http://localhost:8001`.
 
-#### `yarn eject`
+### Install the local build in Standard Notes
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. Create `public/ext.json` from the sample:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```bash
+   cp public/sample.ext.json public/ext.json
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+2. Edit `public/ext.json` and set both `url` and `latest_url` to `http://localhost:8001`.
+3. Keep `yarn start` running.
+4. In Standard Notes, open **Extensions** and import `http://localhost:8001/ext.json`.
+5. Activate the editor, open a note, and select **markmap** from the note's editor menu.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+For a production-like local check, build first and serve the generated files with CORS enabled:
 
-### Learn More
+```bash
+yarn build
+npx http-server ./build -p 3000 --cors
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Then point a local manifest at `http://localhost:3000`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Quality checks
+
+```bash
+# Run the Jest suite once
+CI=true yarn test --watchAll=false --runInBand
+
+# Create a production build
+yarn build
+```
+
+## Deployment
+
+Pushing to `main` runs the GitHub Actions workflow and publishes `build/` to the `gh-pages` branch. GitHub Pages then serves the editor at:
+
+`https://kjelly.github.io/sn-markmap/`
+
+The workflow can also be started manually from the repository's **Actions** tab. For a local fallback, `yarn deploy-stable` builds and publishes directly to `gh-pages`.
+
+## Project structure
+
+- `src/components/Editor.tsx` — Standard Notes bridge, Markdown editor, and Markmap controls
+- `src/stylesheets/main.scss` — responsive layout and accessibility styles
+- `public/sample.ext.json` — hosted plugin manifest
+- `.github/workflows/deploy-pages.yml` — GitHub Pages deployment workflow
+
+## License
+
+[AGPL-3.0-or-later](LICENSE)
